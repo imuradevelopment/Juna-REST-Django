@@ -13,21 +13,24 @@
 
 <script>
 // @ is an alias to /src
+import {mapGetters, mapActions} from 'vuex'
+import {UPDATE_POSTS} from "../store/mutation-types";
 
 export default {
-    name: "PostList",
-    data() {
-        return {
-            postList: [],
-        }
+    name: 'PostList',
+    computed: {
+        ...mapGetters(['postList'])
     },
-    mounted() {
+    methods: {
+        ...mapActions([UPDATE_POSTS])
+    },
+    created() {
         this.$http(this.$httpPosts)
             .then(response => {
                 return response.json()
             })
             .then(data => {
-                this.postList = data
+                this[UPDATE_POSTS](data)
             })
     }
 };
