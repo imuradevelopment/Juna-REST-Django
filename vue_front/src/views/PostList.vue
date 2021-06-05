@@ -14,7 +14,9 @@
 <script>
 // @ is an alias to /src
 import {mapGetters, mapActions} from 'vuex'
-import {UPDATE_POSTS} from "../store/mutation-types";
+import {UPDATE_POSTS} from "@/store/mutation-types";
+import {RepositoryFactory} from '@/repository/repositoryFactory';
+const PostsRepository = RepositoryFactory.get('posts')
 
 export default {
     name: 'PostList',
@@ -22,16 +24,17 @@ export default {
         ...mapGetters(['postList'])
     },
     methods: {
-        ...mapActions([UPDATE_POSTS])
+        ...mapActions([UPDATE_POSTS]),
+        async fetch(){
+            this.isLoading = true
+            const {data} = await PostsRepository.get()
+            this.isLoading = false
+            this.posts = data;
+            this[UPDATE_POSTS](data)
+        }
     },
     created() {
-        this.$http(this.$httpPosts)
-            .then(response => {
-                return response.json()
-            })
-            .then(data => {
-                this[UPDATE_POSTS](data)
-            })
+        this.fetch()
     }
 };
 </script>
