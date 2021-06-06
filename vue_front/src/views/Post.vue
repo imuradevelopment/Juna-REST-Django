@@ -1,6 +1,6 @@
 <template>
     <article class="container" v-if="post">
-        <nav id="back"><a href="/" title="前ページへ戻る"><img src="@/assets/back.png"></a></nav>
+        <nav id="back"><a @click="goBack" title="前ページへ戻る"><img src="@/assets/back.png"></a></nav>
         <p class="post-category" :style="{'color': post.category.color}">{{post.category.name}}</p>
         <h1 class="post-title">{{post.title}}</h1>
         <p class="post-lead">{{post.lead_text}}</p>
@@ -18,14 +18,22 @@ import {RepositoryFactory} from '@/repository/repositoryFactory';
 const PostsRepository = RepositoryFactory.get('posts')
 
 export default {
-    name: 'post',
+    name: 'Post',
     props: {
         id: {type: Number},
     },
     data() {
         return {
             post: {},
+            hasBefore: false,
         }
+    },
+    beforeRouteEnter(to, from, next) {
+        next(component => {
+            if (from.name) {
+                component.hasBefore = true
+            }
+        })
     },
     computed: {
         ...mapGetters(['isLoading']),
@@ -47,7 +55,14 @@ export default {
                 top: 0,
                 behavior: "smooth"
             });
-        }
+        },
+        goBack() {
+            if (this.hasBefore) {
+                this.$router.go(-1)
+            } else {
+                this.$router.push({name: 'posts'})
+            }
+        },
     }
 }
 </script>

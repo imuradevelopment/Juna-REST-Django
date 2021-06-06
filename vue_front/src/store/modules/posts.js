@@ -1,10 +1,14 @@
-import {UPDATE_POSTS} from "../mutation-types";
+import {UPDATE_POSTS, UPDATE_CATEGORIES} from "../mutation-types";
 
 export default {
     state: () => ({
         posts: {},
+        categories: [],
     }),
     getters: {
+        categoryList(state) {
+            return state.categories
+        },
         postList(state) {
             return state.posts.results;
         },
@@ -34,11 +38,17 @@ export default {
         },
     },
     mutations: {
+        [UPDATE_CATEGORIES](state, payload) {
+            state.categories = payload
+        },
         [UPDATE_POSTS](state, payload) {
             state.posts = payload;
         },
     },
     actions: {
+        [UPDATE_CATEGORIES]({commit}, payload) {
+            commit(UPDATE_CATEGORIES, payload)
+        },
         [UPDATE_POSTS]({commit}, payload) {
             commit(UPDATE_POSTS, payload);
         },
