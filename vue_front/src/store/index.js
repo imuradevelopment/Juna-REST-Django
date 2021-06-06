@@ -1,28 +1,18 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import {UPDATE_POSTS} from "./mutation-types";
+import posts from './modules/posts';
+import display from './modules/display';
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
     strict: true,
-    state: {
-        posts: {},
+    state: {},
+    getters: {},
+    mutations: {},
+    actions: {},
+    modules: {
+        posts,
+        display,
     },
-    getters: {
-        postList(state) {
-            return state.posts;
-        },
-    },
-    mutations: {
-        [UPDATE_POSTS](state, payload) {
-            state.posts = payload;
-        },
-    },
-    actions: {
-        [UPDATE_POSTS]({commit}, payload) {
-            commit(UPDATE_POSTS, payload);
-        },
-    },
-    modules: {},
 });

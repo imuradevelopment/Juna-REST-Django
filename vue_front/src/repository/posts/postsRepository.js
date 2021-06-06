@@ -1,15 +1,17 @@
 import Repository from '@/repository/repository';
 
-const resource = '/posts';
+const postsResource = '/posts';
+// const detailResource = '/detail';
 
 export default {
-    get(){
-        return Repository.get(`${resource}`);
+    get(params=''){
+        return Repository.get(`${postsResource}${params}`);
     },
     getPost(postId){
-        return Repository.get(`${resource}/${postId}`);
+        console.log(`${postsResource}/${postId}`);
+        return Repository.get(`${postsResource}/${postId}`);
     },
     createPost(payload){
-        return Repository.post(`${resource}`, payload);
+        return Repository.post(`${postsResource}`, payload);
     }
 }

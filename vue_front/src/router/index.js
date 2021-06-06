@@ -2,6 +2,7 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import Home from "../views/Home.vue";
 import PostList from "@/views/PostList.vue";
+import Post from '@/views/Post.vue'
 
 Vue.use(VueRouter);
 
@@ -23,6 +24,14 @@ const routes = [
         path: "/posts",
         name: "PostList",
         component: PostList,
+    },
+    {
+        path: '/posts/:id',
+        name: 'posts',
+        component: Post,
+        props: routes => ({
+            id: Number(routes.params.id),
+        })
     },
 ];
 
