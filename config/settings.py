@@ -33,6 +33,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'juna.apps.JunaConfig',
+    'djoserEmails.apps.DjoseremailsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -161,7 +162,7 @@ REST_FRAMEWORK = {
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # メールを実際に送信する
-#EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 # メールサーバーへの接続設定
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
@@ -183,4 +184,12 @@ DJOSER = {
     'ACTIVATION_URL': '#/activate/{uid}/{token}',
     'USER_CREATE_PASSWORD_RETYPE' : True,
     'SERIALIZERS': {},
+    'EMAIL': {
+        'activation': 'djoserEmails.email.ActivationEmail',
+        'confirmation': 'djoserEmails.email.ConfirmationEmail',
+        'password_reset': 'djoserEmails.email.PasswordResetEmail',
+        'password_changed_confirmation': 'djoserEmails.email.PasswordChangedConfirmationEmail',
+        'username_changed_confirmation': 'djoserEmails.email.UsernameChangedConfirmationEmail',
+        'username_reset': 'djoserEmails.email.UsernameResetEmail',
+    },
 }
