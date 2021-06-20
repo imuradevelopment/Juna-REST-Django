@@ -33,6 +33,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'juna.apps.JunaConfig',
+    'account.apps.AccountConfig',
     'djoserEmails.apps.DjoseremailsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -142,6 +143,7 @@ if DEBUG:
         'http://localhost:8080',
         'http://localhost:8081',
         'http://localhost:8081',
+        'http://localhost:3000',
     )
 
 
@@ -149,7 +151,7 @@ SIMPLE_JWT = {
     #トークンをJWTに設定
     'AUTH_HEADER_TYPES':('JWT'),
     #トークンの持続時間の設定
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60)
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5)
 }
 
 REST_FRAMEWORK = {
@@ -171,6 +173,7 @@ EMAIL_HOST_PASSWORD = ''
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = EMAIL_HOST_PASSWORD
 
+AUTH_USER_MODEL = 'account.User'
 # djoserの設定
 DJOSER = {
     'USER_ID_FIELD': 'id',
@@ -184,6 +187,7 @@ DJOSER = {
     'ACTIVATION_URL': '#/activate/{uid}/{token}',
     'USER_CREATE_PASSWORD_RETYPE' : True,
     'SERIALIZERS': {},
+    'TOKEN_MODEL':None,
     'EMAIL': {
         'activation': 'djoserEmails.email.ActivationEmail',
         'confirmation': 'djoserEmails.email.ConfirmationEmail',
