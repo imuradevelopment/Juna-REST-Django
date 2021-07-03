@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_cleanup.apps.CleanupConfig',  # django-cleanupを使いたいなら、これも追加
     'rest_framework',  # 追加
-    'djoser'
+    'djoser',
 ]
 
 MIDDLEWARE = [
@@ -144,6 +144,7 @@ if DEBUG:
         'http://localhost:8081',
         'http://localhost:8081',
         'http://localhost:3000',
+        'http://192.168.43.22:3333',
     )
 
 
@@ -180,12 +181,12 @@ DJOSER = {
     'LOGIN_FIELD' : 'username',
     'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
     'USERNAME_RESET_CONFIRM_URL': '#/username/reset/confirm/{uid}/{token}',
-    'SEND_ACTIVATION_EMAIL': True,
-    'SEND_CONFIRMATION_EMAIL': True,
-    'PASSWORD_CHANGED_EMAIL_CONFIRMATION' : True,
-    'USERNAME_CHANGED_EMAIL_CONFIRMATION' : True,
+    'SEND_ACTIVATION_EMAIL': False,
+    'SEND_CONFIRMATION_EMAIL': False,
+    'PASSWORD_CHANGED_EMAIL_CONFIRMATION' : False,
+    'USERNAME_CHANGED_EMAIL_CONFIRMATION' : False,
     'ACTIVATION_URL': '#/activate/{uid}/{token}',
-    'USER_CREATE_PASSWORD_RETYPE' : True,
+    'USER_CREATE_PASSWORD_RETYPE' : False,
     'SERIALIZERS': {},
     'TOKEN_MODEL':None,
     'EMAIL': {
