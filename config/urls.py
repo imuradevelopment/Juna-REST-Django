@@ -20,9 +20,11 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/v1/', include('account.urls')),
     path('api/v1/', include('juna.urls')),
     path('api/v1/', include('djoser.urls')),
     path('api/v1/auth/', include('djoser.urls.jwt')),
+    path('api/v1/auth/', include('djoser.urls.authtoken')), # 一時的に追加
 ]
 
 urlpatterns += static(

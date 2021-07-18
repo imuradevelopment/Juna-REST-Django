@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_cleanup.apps.CleanupConfig',  # django-cleanupを使いたいなら、これも追加
     'rest_framework',  # 追加
+    'rest_framework.authtoken', # 一時的に追加
     'djoser',
 ]
 
@@ -152,12 +153,13 @@ SIMPLE_JWT = {
     #トークンをJWTに設定
     'AUTH_HEADER_TYPES':('JWT'),
     #トークンの持続時間の設定
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5)
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=120)
 }
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.TokenAuthentication', # 一時的に追加
+        #'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
 }
 
@@ -177,8 +179,8 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_PASSWORD
 AUTH_USER_MODEL = 'account.User'
 # djoserの設定
 DJOSER = {
-    'USER_ID_FIELD': 'id',
-    'LOGIN_FIELD' : 'username',
+    'USER_ID_FIELD': 'user_id',
+    'LOGIN_FIELD' : 'user_id',
     'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
     'USERNAME_RESET_CONFIRM_URL': '#/username/reset/confirm/{uid}/{token}',
     'SEND_ACTIVATION_EMAIL': False,
@@ -188,7 +190,7 @@ DJOSER = {
     'ACTIVATION_URL': '#/activate/{uid}/{token}',
     'USER_CREATE_PASSWORD_RETYPE' : False,
     'SERIALIZERS': {},
-    'TOKEN_MODEL':None,
+    #'TOKEN_MODEL':None, # 一時的に許可
     'EMAIL': {
         'activation': 'djoserEmails.email.ActivationEmail',
         'confirmation': 'djoserEmails.email.ConfirmationEmail',

@@ -32,19 +32,6 @@ class StandardResultsSetPagination(pagination.PageNumberPagination):
             'rangeLast': min((self.page.number * self.page_size), self.page.paginator.count),
         })
 
-    # def get_next_link(self):
-    #     if not self.page.has_next():
-    #         return None
-    #     page_number = self.page.next_page_number()
-    #     return replace_query_param('', self.page_query_param, page_number)
-
-    # def get_previous_link(self):
-    #     if not self.page.has_previous():
-    #         return None
-    #     page_number = self.page.previous_page_number()
-    #     if page_number == 1:
-    #         return None
-    #     return replace_query_param('', self.page_query_param, page_number)
 
 class PostList(generics.ListAPIView):
     queryset = Post.objects.all()

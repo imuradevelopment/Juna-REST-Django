@@ -1,41 +1,79 @@
-from django.db import models
-
-# Create your models here.
+from django.apps import apps
+from django.contrib.auth.hashers import make_password
+from django.conf import settings
 from django.db import models
 from django.core.mail import send_mail
 from django.contrib.auth.models import PermissionsMixin, UserManager
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import AbstractUser
-from django.contrib.auth.validators import UnicodeUsernameValidator
+from django.contrib.auth.validators import UnicodeUsernameValidator, ASCIIUsernameValidator
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 import uuid as uuid_lib
 
+
+class CustomUserManager(UserManager):
+    """ユーザーマネージャー"""
+    use_in_migrations = True
+
+    def _create_user(self, user_id, username, email, password, **extra_fields):
+        if not email:
+            raise ValueError('The given email must be set')
+        email = self.normalize_email(email)
+        GlobalUserModel = apps.get_model(self.model._meta.app_label, self.model._meta.object_name)
+        username = GlobalUserModel.normalize_username(username)
+        user = self.model(user_id=user_id, username=username, email=email, **extra_fields)
+        user.password = make_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_user(self, user_id, username, email, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', False)
+        extra_fields.setdefault('is_superuser', False)
+        return self._create_user(email, password, **extra_fields)
+
+    def create_superuser(self, user_id, username, email, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Superuser must have is_staff=True.')
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('Superuser must have is_superuser=True.')
+
+        return self._create_user(username, email, password, **extra_fields)
+
+
 class User(AbstractBaseUser, PermissionsMixin):
     """
-    管理者に準拠したパーミッションを持つ、完全に機能するUserモデルを実装する抽象ベースクラスです。
-
-    ユーザー名とパスワードは必須です。その他の項目は任意です。
+    カスタムユーザーモデル
     """
-
     id = models.UUIDField(
         default=uuid_lib.uuid4,
         primary_key=True,
         editable=False
         )
+    user_id_validator = ASCIIUsernameValidator()
+    user_id = models.CharField(
+        _('user_id'),
+        max_length=30,
+        unique=True,
+        help_text=_('半角アルファベット、半角数字、@/./+/-/_ で150文字以下にしてください。'),
+        validators=[user_id_validator],
+        error_messages={
+            'unique': _("同じユーザーIDが既に登録済みです。"),
+        },
+    )
     username_validator = UnicodeUsernameValidator()
     username = models.CharField(
         _('username'),
         max_length=150,
-        unique=True,
-        help_text=_('Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.'),
+        help_text=_('半角アルファベット、半角数字、@/./+/-/_ で150文字以下にしてください。'),
         validators=[username_validator],
         error_messages={
             'unique': _("A user with that username already exists."),
         },
     )
-    # first_name = models.CharField(_('first name'), max_length=150, blank=True)
-    # last_name = models.CharField(_('last name'), max_length=150, blank=True)
     email = models.EmailField(_('email address'), unique=True)
     is_staff = models.BooleanField(
         _('staff status'),
@@ -55,8 +93,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     EMAIL_FIELD = 'email'
-    USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['email']
+    REQUIRED_FIELDS = ['email', 'username']
+    USERNAME_FIELD = 'user_id'
 
     class Meta:
         verbose_name = _('user')
@@ -81,4 +119,20 @@ class User(AbstractBaseUser, PermissionsMixin):
         """Send an email to this user."""
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
+    def __str__(self):
+        return self.user_id
 
+
+class userProfile(models.Model):
+    """
+    ユーザープロフィール
+    """
+    user=models.OneToOneField(settings.AUTH_USER_MODEL,on_delete=models.CASCADE,related_name="profile",to_field="user_id", primary_key=True)
+    description = models.TextField(blank=True, null=True)
+    location=models.CharField(max_length=30,blank=True)
+    date_joined=models.DateTimeField(auto_now_add=True)
+    updated_on=models.DateTimeField(auto_now=True)
+    is_organizer = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.user.user_id
