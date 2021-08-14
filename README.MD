@@ -15,3 +15,11 @@
 |setuptools| 54.1.2|
 |sqlparse| 0.4.1|
 |wheel| 0.36.2|
+
+## メモ
+
+```bash
+cd ../../mnt/c/work/REST
+find . -path "*/migrations/*.py" -not -name "__init__.py" -not -path "*django/db/*" -delete
+find .  -path "*/migrations/*.pyc" -not -path "*django/db/*" -delete
+```

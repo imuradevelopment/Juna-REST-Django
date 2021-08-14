@@ -1,0 +1,118 @@
+from rest_framework import serializers
+from .models import Article, Tag, Comment, Reply
+from account.models import User
+
+
+class TagSerializer(serializers.ModelSerializer):
+    """
+    タグのシリアライザー
+    """
+    class Meta:
+        model = Tag
+        fields = '__all__'
+
+
+class TagListSerializer(serializers.ListSerializer):
+    """
+    タグのリストシリアライザー
+    """
+    child = TagSerializer()
+
+
+
+
+
+
+
+
+# class CommentCreateSerializer(serializers.ModelSerializer):
+#     """
+#     コメントシリアライザ
+#     """
+#     commenter = serializers.ReadOnlyField(source='commenter.user_id')
+#     class Meta:
+#         model = Comment
+#         fields = '__all__'
+
+
+class ReplyCreateSerializer(serializers.ModelSerializer):
+    target_comment = serializers.PrimaryKeyRelatedField(queryset=Comment.objects.all())
+    replyer = serializers.ReadOnlyField(source='replyer.user_id')
+
+    class Meta:
+        model = Reply
+        #fields = ('text', 'target_comment', 'replyer', 'created_at')
+        fields = '__all__'
+        read_only_fields = ('created_at',)
+
+
+class CommentCreateSerializer(serializers.ModelSerializer):
+    #target_article = serializers.PrimaryKeyRelatedField(source='target_article', queryset=Article.objects.all(), write_only=True)
+    #commenter = serializers.PrimaryKeyRelatedField(source='user', queryset=User.objects.all(), write_only=True)
+    #commenter = serializers.SlugRelatedField(source='user', queryset=User.objects.all(), write_only=True)
+    target_article = serializers.PrimaryKeyRelatedField(queryset=Article.objects.all())
+    commenter = serializers.ReadOnlyField(source='commenter.user_id')
+    reply_set = ReplyCreateSerializer(read_only=True, many=True)
+
+    class Meta:
+        model = Comment
+        #fields = ('text', 'target_article', 'commenter', 'created_at', 'reply_set')
+        fields = '__all__'
+        read_only_fields = ('created_at',)
+
+class ArticleCreateSerializer(serializers.ModelSerializer):
+    """
+    記事の詳細データ取得ビューでシリアライザー
+    """
+    tag = TagListSerializer()
+    author = serializers.ReadOnlyField(source='author.user_id')
+
+    def create(self, validated_data):
+        tags = []
+        # 関連先のオブジェクトの登録
+        for tag_data in validated_data.pop('tag'):
+            tag, _ = Tag.objects.get_or_create(**tag_data)
+            tags.append(tag)
+        # 関連先オブジェクトとの関連レコードを登録
+        article = super().create(validated_data)
+        article.tag.set(tags)
+        return article
+
+    class Meta:
+        model = Article
+        fields = '__all__'
+
+
+class ArticleDescriptionSerializer(serializers.ModelSerializer):
+    """
+    記事一覧ビューで使う記事モデルのシリアライザー
+    """
+    tag = TagListSerializer(read_only=True)
+
+    class Meta:
+        model = Article
+        exclude = ('main_text','updated_on')
+
+
+class ArticleRUDSerializer(serializers.ModelSerializer):
+    """
+    記事の詳細データ取得ビューでシリアライザー
+    """
+    tag = TagListSerializer()
+    author = serializers.CharField(read_only=True)
+    comment_set = CommentCreateSerializer(read_only=True, many=True)
+
+    def update(self, instance, validated_data):
+        tags = []
+        # 関連先のオブジェクトの登録
+        for tag_data in validated_data.pop('tag'):
+            tag, _ = Tag.objects.get_or_create(**tag_data)
+            tags.append(tag)
+        # 関連先オブジェクトとの関連レコードを登録
+        article = super().update(instance, validated_data)
+        article.tag.set(tags)
+        return article
+
+    class Meta:
+        model = Article
+        fields = '__all__'

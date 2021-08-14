@@ -32,9 +32,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'juna.apps.JunaConfig',
+    'article.apps.ArticleConfig',
     'account.apps.AccountConfig',
-    'djoserEmails.apps.DjoseremailsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -188,15 +187,21 @@ DJOSER = {
     'PASSWORD_CHANGED_EMAIL_CONFIRMATION' : False,
     'USERNAME_CHANGED_EMAIL_CONFIRMATION' : False,
     'ACTIVATION_URL': '#/activate/{uid}/{token}',
-    'USER_CREATE_PASSWORD_RETYPE' : False,
-    'SERIALIZERS': {},
+    'USER_CREATE_PASSWORD_RETYPE': False,
+    'HIDE_USERS': False,
+    'SERIALIZERS': {
+        'user': 'account.serializers.UserSerializer',
+        'current_user': 'account.serializers.UserSerializer',
+        'user_create': 'account.serializers.UserCreateSerializer',
+        'user_delete': 'account.serializers.UserDeleteSerializer',
+    },
     #'TOKEN_MODEL':None, # 一時的に許可
     'EMAIL': {
-        'activation': 'djoserEmails.email.ActivationEmail',
-        'confirmation': 'djoserEmails.email.ConfirmationEmail',
-        'password_reset': 'djoserEmails.email.PasswordResetEmail',
-        'password_changed_confirmation': 'djoserEmails.email.PasswordChangedConfirmationEmail',
-        'username_changed_confirmation': 'djoserEmails.email.UsernameChangedConfirmationEmail',
-        'username_reset': 'djoserEmails.email.UsernameResetEmail',
+        'activation': 'account.emails.ActivationEmail',
+        'confirmation': 'account.emails.ConfirmationEmail',
+        'password_reset': 'account.emails.PasswordResetEmail',
+        'password_changed_confirmation': 'account.emails.PasswordChangedConfirmationEmail',
+        'username_changed_confirmation': 'account.emails.UsernameChangedConfirmationEmail',
+        'username_reset': 'account.emails.UsernameResetEmail',
     },
 }

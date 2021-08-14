@@ -1,58 +1,128 @@
 @register_info_admin = {"email": "admin@example.com","user_id": "admin","username": "アドミン","password": "password"}
 @register_info_01 = {"email": "user01@example.com","user_id": "user01","username": "ユーザー01","password": "passw0rd01"}
 @register_info_02 = {"email": "user02@example.com","user_id": "user02","username": "ユーザー02","password": "passw0rd02"}
-@user_info_admin = {"user_id": "admin","password": "password"}
-@user_info_01 = {"user_id": "user01","password": "passw0rd01"}
-@user_info_02 = {"user_id": "user02","password": "passw0rd02"}
+
+@login_admin = {"user_id": "admin","password": "password"}
+@login_user01 = {"user_id": "user01","password": "passw0rd01"}
+@login_user02 = {"user_id": "user02","password": "passw0rd02"}
+
 @token = {{login.response.body.$.auth_token}}
 @user_id = {{me.response.body.$.user_id}}
 @username = {{me.response.body.$.username}}
 
-# @name login
-POST http://127.0.0.1:8000/api/v1/auth/token/login/
+
+@user_info_current = {register.response.body.$.user_id}
+@register_info_current = {"email": "user02@example.com","user_id": "user02","username": "ユーザー02","password": "passw0rd02"}
+@login_info_current = {"user_id": "user02","password": "passw0rd02"}
+@current_password = {"current_password":"passw0rd01"}
+
+# @name register
+POST   http://127.0.0.1:8000/api/v1/users/
 content-type: application/json
 
-{{register_info_01}}
+{{register_info_current}}
+
 ###
 
-# @name logout
-POST http://127.0.0.1:8000/api/v1/auth/token/logout/
+# @name login
+POST   http://127.0.0.1:8000/api/v1/auth/token/login/
+content-type: application/json
+
+{{login_info_current}}
+
+###
+POST   http://127.0.0.1:8000/api/v1/auth/token/logout/
 Authorization: token {{token}}
+content-type: application/json
 
-
-###
-
-# @name all_profile
-GET http://127.0.0.1:8000/api/v1/profiles/
-Authorization: token {{token}}
 
 
 ###
 
-# @name profile
-GET http://127.0.0.1:8000/api/v1/profiles/{{user_id}}/
-Authorization: token {{token}}
-
-
-###
-PUT http://127.0.0.1:8000/api/v1/profiles/{{user_id}}/
+# @name article_create
+POST   http://127.0.0.1:8000/api/v1/articles/create/
 Authorization: token {{token}}
 content-type: application/json
 
 {
-  "user": {
-    "user_id": "user02",
-    "username": "ユーザー02_権限テスト"
-  },
-  "description": null,
-  "location": "",
-  "date_joined": "2021-07-10T21:42:10.767778+09:00",
-  "updated_on": "2021-07-10T21:42:10.767778+09:00",
-  "is_organizer": false
+  "tag": [
+    {
+      "name": "タグ1"
+    },
+    {
+      "name": "タグ2"
+    }
+  ],
+  "title": "記事",
+  "thumbnail": null,
+  "main_text": "見出し"
 }
 
 ###
-PATCH http://127.0.0.1:8000/api/v1/profiles/{{user_id}}/
+
+# @name article_comment_create
+POST   http://127.0.0.1:8000/api/v1/articles/comments/
+Authorization: token {{token}}
+content-type: application/json
+
+{
+    "target_article":"c160892f-78b0-4bd4-98aa-02f34a8abf6e",
+    "text":"コメント"
+}
+
+###
+
+# @name article_comment_create
+POST   http://127.0.0.1:8000/api/v1/articles/comments/reply/
+Authorization: token {{token}}
+content-type: application/json
+
+{
+    "target_comment":"1",
+    "text":"リプライ"
+}
+
+###
+
+# @name articles
+GET    http://127.0.0.1:8000/api/v1/articles/
+Authorization: token {{token}}
+content-type: application/json
+
+
+
+###
+@id = c160892f-78b0-4bd4-98aa-02f34a8abf6e
+# @name articles_id
+GET    http://127.0.0.1:8000/api/v1/articles/{{id}}/
+Authorization: token {{token}}
+content-type: application/json
+
+
+
+###
+PUT    http://127.0.0.1:8000/api/v1/articles/{{id}}/
+Authorization: token {{token}}
+content-type: application/json
+
+{
+  "tag": [
+      {"name":"タグ3"}
+  ],
+  "title": "記事3",
+  "thumbnail": null,
+  "main_text": "## 見出し1\r\n## 見出し2"
+}
+
+###
+PATCH  http://127.0.0.1:8000/api/v1/articles/{{id}}/
+Authorization: token {{token}}
+content-type: application/json
+
+
+
+###
+DELETE http://127.0.0.1:8000/api/v1/articles/{{id}}/
 Authorization: token {{token}}
 content-type: application/json
 
@@ -60,35 +130,58 @@ content-type: application/json
 
 ###
 
-# @name user
-GET http://127.0.0.1:8000/api/v1/users/
+# @name favorite
+POST   http://127.0.0.1:8000/api/v1/articles/favorite/
 Authorization: token {{token}}
+content-type: application/json
+
+{
+    "target_article":"c160892f-78b0-4bd4-98aa-02f34a8abf6e"
+}
+###
+DELETE http://127.0.0.1:8000/api/v1/articles/favorite/
+Authorization: token {{token}}
+content-type: application/json
+
+{
+    "target_article":"c160892f-78b0-4bd4-98aa-02f34a8abf6e"
+}
+###
+
+# @name tags
+GET    http://127.0.0.1:8000/api/v1/tags/
+Authorization: token {{token}}
+content-type: application/json
+
 
 
 ###
 
-# @name register
-POST http://127.0.0.1:8000/api/v1/users/
+# @name users
+GET    http://127.0.0.1:8000/api/v1/users/
+Authorization: token {{token}}
 content-type: application/json
 
-{{register_info_01}}
+
 
 ###
 
 # @name me
-GET http://127.0.0.1:8000/api/v1/users/me/
-Authorization: token {{token}}
-
-
-###
-PUT http://127.0.0.1:8000/api/v1/users/me/
+GET    http://127.0.0.1:8000/api/v1/users/me/
 Authorization: token {{token}}
 content-type: application/json
 
 
 
 ###
-PATCH http://127.0.0.1:8000/api/v1/users/me/
+PUT    http://127.0.0.1:8000/api/v1/users/me/
+Authorization: token {{token}}
+content-type: application/json
+
+
+
+###
+PATCH  http://127.0.0.1:8000/api/v1/users/me/
 Authorization: token {{token}}
 content-type: application/json
 
@@ -99,49 +192,52 @@ DELETE http://127.0.0.1:8000/api/v1/users/me/
 Authorization: token {{token}}
 content-type: application/json
 
-
-
-###
-
-# @name users
-GET http://127.0.0.1:8000/api/v1/users/{{user_id}}/
-Authorization: token {{token}}
-
+{{current_password}}
 
 ###
-PUT http://127.0.0.1:8000/api/v1/users/{{user_id}}/
+
+# @name users_id
+GET    http://127.0.0.1:8000/api/v1/users/{{user_id}}/
 Authorization: token {{token}}
 content-type: application/json
 
 
 
 ###
-PATCH http://127.0.0.1:8000/api/v1/users/{{user_id}}/
+PUT    http://127.0.0.1:8000/api/v1/users/{{user_id}}/
 Authorization: token {{token}}
 content-type: application/json
+
+
+
+###
+PATCH  http://127.0.0.1:8000/api/v1/users/{{user_id}}/
+Authorization: token {{token}}
+content-type: application/json
+
 
 
 ###
 DELETE http://127.0.0.1:8000/api/v1/users/{{user_id}}/
 Authorization: token {{token}}
+content-type: application/json
+
 
 
 ###
 
-# @name set_password
-POST http://127.0.0.1:8000/api/v1/users/set_password/
+POST   http://127.0.0.1:8000/api/v1/users/set_password/
 Authorization: token {{token}}
 content-type: application/json
 
-{"current_password":"passw0rd011", "new_password": "passw0rd01"}
+
 
 ###
 
-# @name set_user_id
-POST http://127.0.0.1:8000/api/v1/users/set_user_id/
+POST   http://127.0.0.1:8000/api/v1/users/set_user_id/
 Authorization: token {{token}}
 content-type: application/json
 
-{"current_password": "passw0rd01", "new_user_id": "user01"}
+
 
 ###

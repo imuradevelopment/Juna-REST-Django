@@ -1,15 +1,17 @@
-from django.apps import apps
-from django.contrib.auth.hashers import make_password
-from django.conf import settings
-from django.db import models
-from django.core.mail import send_mail
-from django.contrib.auth.models import PermissionsMixin, UserManager
-from django.contrib.auth.base_user import AbstractBaseUser
-from django.contrib.auth.models import AbstractUser
-from django.contrib.auth.validators import UnicodeUsernameValidator, ASCIIUsernameValidator
-from django.utils.translation import ugettext_lazy as _
-from django.utils import timezone
 import uuid as uuid_lib
+
+from django.apps import apps
+from django.conf import settings
+from django.contrib.auth.base_user import AbstractBaseUser
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.models import (AbstractUser, PermissionsMixin,
+                                        UserManager)
+from django.contrib.auth.validators import (ASCIIUsernameValidator,
+                                            UnicodeUsernameValidator)
+from django.core.mail import send_mail
+from django.db import models
+from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
 
 
 class CustomUserManager(UserManager):
@@ -55,7 +57,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         )
     user_id_validator = ASCIIUsernameValidator()
     user_id = models.CharField(
-        _('user_id'),
+        _('ユーザーID'),
         max_length=30,
         unique=True,
         help_text=_('半角アルファベット、半角数字、@/./+/-/_ で150文字以下にしてください。'),
@@ -89,12 +91,14 @@ class User(AbstractBaseUser, PermissionsMixin):
         ),
     )
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
-
+    is_organizer = models.BooleanField(default=False)
+    description = models.TextField(blank=True, null=True)
     objects = UserManager()
 
     EMAIL_FIELD = 'email'
     REQUIRED_FIELDS = ['email', 'username']
     USERNAME_FIELD = 'user_id'
+    UPDATEONLY_FIELD = ['description', 'is_organizer']
 
     class Meta:
         verbose_name = _('user')
@@ -121,18 +125,3 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.user_id
-
-
-class userProfile(models.Model):
-    """
-    ユーザープロフィール
-    """
-    user=models.OneToOneField(settings.AUTH_USER_MODEL,on_delete=models.CASCADE,related_name="profile",to_field="user_id", primary_key=True)
-    description = models.TextField(blank=True, null=True)
-    location=models.CharField(max_length=30,blank=True)
-    date_joined=models.DateTimeField(auto_now_add=True)
-    updated_on=models.DateTimeField(auto_now=True)
-    is_organizer = models.BooleanField(default=False)
-
-    def __str__(self):
-        return self.user.user_id
