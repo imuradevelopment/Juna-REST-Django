@@ -6,12 +6,9 @@ from .serializers import TagSerializer, ArticleRUDSerializer, ArticleCreateSeria
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
-
-
 class TagListView(generics.ListAPIView):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
-
 
 class ArticleCreateView(generics.CreateAPIView):
     serializer_class = ArticleCreateSerializer
@@ -19,11 +16,9 @@ class ArticleCreateView(generics.CreateAPIView):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
-
 class ArticleRUDView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Article.objects.all()
     serializer_class = ArticleRUDSerializer
-
 
 class StandardResultsSetPagination(pagination.PageNumberPagination):
     page_size = 10
@@ -42,7 +37,6 @@ class StandardResultsSetPagination(pagination.PageNumberPagination):
             'rangeLast': min((self.page.number * self.page_size), self.page.paginator.count),
         })
 
-
 class ArticleListView(generics.ListAPIView):
     queryset = Article.objects.all()
     serializer_class = ArticleDescriptionSerializer
@@ -50,31 +44,19 @@ class ArticleListView(generics.ListAPIView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-
         keyword = self.request.query_params.get('keyword', None)
         if keyword:
             queryset = queryset.filter(
                 Q(title__icontains=keyword) | Q(lead_text__icontains=keyword) | Q(main_text__icontains=keyword))
-
         category = self.request.query_params.get('category', None)
         if category:
             queryset = queryset.filter(category=category)
-
         return queryset
-
-
-# class CommentCreateView(generics.CreateAPIView):
-#     serializer_class = CommentCreateSerializer
-
-#     def perform_create(self, serializer):
-#         serializer.save(commenter=self.request.user)
-
 
 class CommentCreateView(generics.CreateAPIView):
     serializer_class = CommentCreateSerializer
 
     def post(self, request, *args, **kwargs):
-
         response = super().post(request, *args, **kwargs)
         # subject = 'ブログにコメントがきました'
         # message = '記事にコメントがきました。管理画面から詳細を確認してください。'
@@ -85,7 +67,6 @@ class CommentCreateView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(commenter=self.request.user)
-
 
 class ReplyCreateView(generics.CreateAPIView):
     serializer_class = ReplyCreateSerializer
@@ -101,7 +82,6 @@ class ReplyCreateView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(replyer=self.request.user)
-
 
 class ArticleView(APIView):
     bad_request_message = 'An error has occurred'

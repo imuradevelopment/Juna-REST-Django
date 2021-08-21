@@ -7,7 +7,6 @@ from django.contrib.auth.password_validation import validate_password
 from django.core import exceptions as django_exceptions
 from django.db import IntegrityError, transaction
 
-
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -26,10 +25,8 @@ class UserSerializer(serializers.ModelSerializer):
                 instance.save(update_fields=["is_active"])
         return super().update(instance, validated_data)
 
-
 class UserCreateSerializer(serializers.ModelSerializer):
     password = serializers.CharField(style={"input_type": "password"}, write_only=True)
-
     default_error_messages = {
         "cannot_create_user": settings.CONSTANTS.messages.CANNOT_CREATE_USER_ERROR
     }
@@ -45,7 +42,6 @@ class UserCreateSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         user = User(**attrs)
         password = attrs.get("password")
-
         try:
             validate_password(password, user)
         except django_exceptions.ValidationError as e:
@@ -53,7 +49,6 @@ class UserCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 {"password": serializer_error["non_field_errors"]}
             )
-
         return attrs
 
     def create(self, validated_data):
@@ -61,7 +56,6 @@ class UserCreateSerializer(serializers.ModelSerializer):
             user = self.perform_create(validated_data)
         except IntegrityError:
             self.fail("cannot_create_user")
-
         return user
 
     def perform_create(self, validated_data):
@@ -72,10 +66,8 @@ class UserCreateSerializer(serializers.ModelSerializer):
                 user.save(update_fields=["is_active"])
         return user
 
-
 class CurrentPasswordSerializer(serializers.Serializer):
     current_password = serializers.CharField(style={"input_type": "password"})
-
     default_error_messages = {
         "invalid_password": settings.CONSTANTS.messages.INVALID_PASSWORD_ERROR
     }

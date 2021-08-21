@@ -2,7 +2,6 @@ from rest_framework import serializers
 from .models import Article, Tag, Comment, Reply
 from account.models import User
 
-
 class TagSerializer(serializers.ModelSerializer):
     """
     タグのシリアライザー
@@ -11,29 +10,11 @@ class TagSerializer(serializers.ModelSerializer):
         model = Tag
         fields = '__all__'
 
-
 class TagListSerializer(serializers.ListSerializer):
     """
     タグのリストシリアライザー
     """
     child = TagSerializer()
-
-
-
-
-
-
-
-
-# class CommentCreateSerializer(serializers.ModelSerializer):
-#     """
-#     コメントシリアライザ
-#     """
-#     commenter = serializers.ReadOnlyField(source='commenter.user_id')
-#     class Meta:
-#         model = Comment
-#         fields = '__all__'
-
 
 class ReplyCreateSerializer(serializers.ModelSerializer):
     target_comment = serializers.PrimaryKeyRelatedField(queryset=Comment.objects.all())
@@ -45,15 +26,10 @@ class ReplyCreateSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ('created_at',)
 
-
 class CommentCreateSerializer(serializers.ModelSerializer):
-    #target_article = serializers.PrimaryKeyRelatedField(source='target_article', queryset=Article.objects.all(), write_only=True)
-    #commenter = serializers.PrimaryKeyRelatedField(source='user', queryset=User.objects.all(), write_only=True)
-    #commenter = serializers.SlugRelatedField(source='user', queryset=User.objects.all(), write_only=True)
     target_article = serializers.PrimaryKeyRelatedField(queryset=Article.objects.all())
     commenter = serializers.ReadOnlyField(source='commenter.user_id')
     reply_set = ReplyCreateSerializer(read_only=True, many=True)
-
     class Meta:
         model = Comment
         #fields = ('text', 'target_article', 'commenter', 'created_at', 'reply_set')
@@ -67,6 +43,10 @@ class ArticleCreateSerializer(serializers.ModelSerializer):
     tag = TagListSerializer()
     author = serializers.ReadOnlyField(source='author.user_id')
 
+    class Meta:
+        model = Article
+        fields = '__all__'
+
     def create(self, validated_data):
         tags = []
         # 関連先のオブジェクトの登録
@@ -78,11 +58,6 @@ class ArticleCreateSerializer(serializers.ModelSerializer):
         article.tag.set(tags)
         return article
 
-    class Meta:
-        model = Article
-        fields = '__all__'
-
-
 class ArticleDescriptionSerializer(serializers.ModelSerializer):
     """
     記事一覧ビューで使う記事モデルのシリアライザー
@@ -93,7 +68,6 @@ class ArticleDescriptionSerializer(serializers.ModelSerializer):
         model = Article
         exclude = ('main_text','updated_on')
 
-
 class ArticleRUDSerializer(serializers.ModelSerializer):
     """
     記事の詳細データ取得ビューでシリアライザー
@@ -101,6 +75,10 @@ class ArticleRUDSerializer(serializers.ModelSerializer):
     tag = TagListSerializer()
     author = serializers.CharField(read_only=True)
     comment_set = CommentCreateSerializer(read_only=True, many=True)
+
+    class Meta:
+        model = Article
+        fields = '__all__'
 
     def update(self, instance, validated_data):
         tags = []
@@ -112,7 +90,3 @@ class ArticleRUDSerializer(serializers.ModelSerializer):
         article = super().update(instance, validated_data)
         article.tag.set(tags)
         return article
-
-    class Meta:
-        model = Article
-        fields = '__all__'

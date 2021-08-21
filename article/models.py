@@ -2,7 +2,6 @@ from django.db import models
 from django.utils import timezone
 from datetime import datetime
 from django.contrib.auth import get_user_model
-#from account.models import User
 import uuid as uuid_lib
 
 User = get_user_model()
@@ -11,7 +10,6 @@ class Tag(models.Model):
     name = models.CharField('タグ名', max_length=50)
     def __str__(self):
         return self.name
-
 
 class Article(models.Model):
     id = models.UUIDField(default=uuid_lib.uuid4,primary_key=True,editable=False)
@@ -31,7 +29,6 @@ class Article(models.Model):
     def __str__(self):
         return self.title
 
-
 class Comment(models.Model):
     """記事に紐づくコメント"""
     text = models.TextField('コメント内容')
@@ -41,7 +38,6 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.text[:20]
-
 
 class Reply(models.Model):
     """コメントに紐づく返信"""

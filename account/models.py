@@ -1,18 +1,14 @@
 import uuid as uuid_lib
-
 from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.hashers import make_password
-from django.contrib.auth.models import (AbstractUser, PermissionsMixin,
-                                        UserManager)
-from django.contrib.auth.validators import (ASCIIUsernameValidator,
-                                            UnicodeUsernameValidator)
+from django.contrib.auth.models import (AbstractUser, PermissionsMixin, UserManager)
+from django.contrib.auth.validators import (ASCIIUsernameValidator, UnicodeUsernameValidator)
 from django.core.mail import send_mail
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-
 
 class CustomUserManager(UserManager):
     """ユーザーマネージャー"""
@@ -42,9 +38,7 @@ class CustomUserManager(UserManager):
             raise ValueError('Superuser must have is_staff=True.')
         if extra_fields.get('is_superuser') is not True:
             raise ValueError('Superuser must have is_superuser=True.')
-
         return self._create_user(username, email, password, **extra_fields)
-
 
 class User(AbstractBaseUser, PermissionsMixin):
     """
@@ -94,7 +88,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_organizer = models.BooleanField(default=False)
     description = models.TextField(blank=True, null=True)
     objects = UserManager()
-
     EMAIL_FIELD = 'email'
     REQUIRED_FIELDS = ['email', 'username']
     USERNAME_FIELD = 'user_id'
@@ -103,7 +96,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     class Meta:
         verbose_name = _('user')
         verbose_name_plural = _('users')
-        # abstract = True
 
     def clean(self):
         super().clean()
