@@ -92,7 +92,7 @@ content-type: application/json
 
 
 ###
-@id = c160892f-78b0-4bd4-98aa-02f34a8abf6e
+@id = c1559c4d-5408-45e1-bf42-a41a138a79de
 # @name articles_id
 GET    http://127.0.0.1:8000/api/v1/articles/{{id}}/
 Authorization: token {{token}}
@@ -136,7 +136,7 @@ Authorization: token {{token}}
 content-type: application/json
 
 {
-    "target_article":"c160892f-78b0-4bd4-98aa-02f34a8abf6e"
+    "target_article":"c1559c4d-5408-45e1-bf42-a41a138a79de"
 }
 ###
 DELETE http://127.0.0.1:8000/api/v1/articles/favorite/

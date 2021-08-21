@@ -18,7 +18,7 @@ class ArticleCreateView(generics.CreateAPIView):
 
 class ArticleRUDView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Article.objects.all()
-    serializer_class = ArticleRUDSerializer
+    serializer_class = ArticleCreateSerializer
 
 class StandardResultsSetPagination(pagination.PageNumberPagination):
     page_size = 10

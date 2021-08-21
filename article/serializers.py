@@ -42,6 +42,7 @@ class ArticleCreateSerializer(serializers.ModelSerializer):
     """
     tag = TagListSerializer()
     author = serializers.ReadOnlyField(source='author.user_id')
+    favorite = serializers.StringRelatedField(many=True)
 
     class Meta:
         model = Article
@@ -58,15 +59,32 @@ class ArticleCreateSerializer(serializers.ModelSerializer):
         article.tag.set(tags)
         return article
 
+    def update(self, instance, validated_data):
+        tags = []
+        # 関連先のオブジェクトの登録
+        for tag_data in validated_data.pop('tag'):
+            tag, _ = Tag.objects.get_or_create(**tag_data)
+            tags.append(tag)
+        # 関連先オブジェクトとの関連レコードを登録
+        article = super().update(instance, validated_data)
+        article.tag.set(tags)
+        return article
+
 class ArticleDescriptionSerializer(serializers.ModelSerializer):
     """
     記事一覧ビューで使う記事モデルのシリアライザー
     """
     tag = TagListSerializer(read_only=True)
+    author = serializers.ReadOnlyField(source='author.user_id')
+    favorite = serializers.StringRelatedField(many=True)
+    favorite_count = serializers.SerializerMethodField('get_favorite_count')
 
     class Meta:
         model = Article
-        exclude = ('main_text','updated_on')
+        exclude = ('main_text',)
+
+    def get_favorite_count(self, instance):
+        return instance.favorite.count()
 
 class ArticleRUDSerializer(serializers.ModelSerializer):
     """
