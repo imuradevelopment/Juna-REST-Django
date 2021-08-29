@@ -1,24 +1,33 @@
-from rest_framework import generics, pagination, response, status
-from rest_framework.views import APIView
-from rest_framework.utils.urls import remove_query_param, replace_query_param
-from .models import Article, Tag, Comment
-from .serializers import TagSerializer, ArticleRUDSerializer, ArticleCreateSerializer, ArticleDescriptionSerializer, CommentCreateSerializer, ReplyCreateSerializer
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
+from rest_framework import generics, pagination, response, status
+from rest_framework.decorators import permission_classes
+from rest_framework.utils.urls import remove_query_param, replace_query_param
+from rest_framework.views import APIView
+
+from .models import Article, Comment, Reply, Tag
+from .serializers import (ArticleDescriptionSerializer, ArticleSerializer,
+                          CommentSerializer, ReplySerializer,
+                          TagSerializer)
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, IsAdminUser
+from .permissions import IsOwnerOrAdminOrReadOnly
+
 
 class TagListView(generics.ListAPIView):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
 
 class ArticleCreateView(generics.CreateAPIView):
-    serializer_class = ArticleCreateSerializer
+    permission_classes = [IsAuthenticated]
+    serializer_class = ArticleSerializer
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
 class ArticleRUDView(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsOwnerOrAdminOrReadOnly]
     queryset = Article.objects.all()
-    serializer_class = ArticleCreateSerializer
+    serializer_class = ArticleSerializer
 
 class StandardResultsSetPagination(pagination.PageNumberPagination):
     page_size = 10
@@ -54,7 +63,7 @@ class ArticleListView(generics.ListAPIView):
         return queryset
 
 class CommentCreateView(generics.CreateAPIView):
-    serializer_class = CommentCreateSerializer
+    serializer_class = CommentSerializer
 
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
@@ -68,8 +77,13 @@ class CommentCreateView(generics.CreateAPIView):
     def perform_create(self, serializer):
         serializer.save(commenter=self.request.user)
 
+class CommentDestroyView(generics.DestroyAPIView):
+    permission_classes = [IsOwnerOrAdminOrReadOnly]
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+
 class ReplyCreateView(generics.CreateAPIView):
-    serializer_class = ReplyCreateSerializer
+    serializer_class = ReplySerializer
 
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
@@ -83,7 +97,13 @@ class ReplyCreateView(generics.CreateAPIView):
     def perform_create(self, serializer):
         serializer.save(replyer=self.request.user)
 
-class ArticleView(APIView):
+class ReplyDestroyView(generics.DestroyAPIView):
+    permission_classes = [IsOwnerOrAdminOrReadOnly]
+    queryset = Reply.objects.all()
+    serializer_class = ReplySerializer
+
+class ArticleFavoriteView(APIView):
+    permission_classes = [IsAuthenticated]
     bad_request_message = 'An error has occurred'
 
     def post(self, request):

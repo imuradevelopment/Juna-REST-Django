@@ -13,7 +13,7 @@
 
 @user_info_current = {register.response.body.$.user_id}
 @register_info_current = {"email": "user02@example.com","user_id": "user02","username": "ユーザー02","password": "passw0rd02"}
-@login_info_current = {"user_id": "user02","password": "passw0rd02"}
+@login_info_current = {"user_id": "admin","password": "password"}
 @current_password = {"current_password":"passw0rd01"}
 
 # @name register
@@ -61,26 +61,38 @@ content-type: application/json
 ###
 
 # @name article_comment_create
-POST   http://127.0.0.1:8000/api/v1/articles/comments/
+POST   http://127.0.0.1:8000/api/v1/articles/comments/create/
 Authorization: token {{token}}
 content-type: application/json
 
 {
-    "target_article":"c160892f-78b0-4bd4-98aa-02f34a8abf6e",
+    "target_article":"9ca62adb-7b6f-4bef-9996-156e7a58ddda",
     "text":"コメント"
 }
 
 ###
 
+DELETE  http://127.0.0.1:8000/api/v1/articles/comments/2/
+Authorization: token {{token}}
+content-type: application/json
+
+###
+
 # @name article_comment_create
-POST   http://127.0.0.1:8000/api/v1/articles/comments/reply/
+POST   http://127.0.0.1:8000/api/v1/articles/comments/replys/create/
 Authorization: token {{token}}
 content-type: application/json
 
 {
-    "target_comment":"1",
+    "target_comment":"2",
     "text":"リプライ"
 }
+
+###
+
+DELETE  http://127.0.0.1:8000/api/v1/articles/comments/replys/2/
+Authorization: token {{token}}
+content-type: application/json
 
 ###
 
@@ -92,7 +104,7 @@ content-type: application/json
 
 
 ###
-@id = c1559c4d-5408-45e1-bf42-a41a138a79de
+@id = 9ca62adb-7b6f-4bef-9996-156e7a58ddda
 # @name articles_id
 GET    http://127.0.0.1:8000/api/v1/articles/{{id}}/
 Authorization: token {{token}}
@@ -107,9 +119,9 @@ content-type: application/json
 
 {
   "tag": [
-      {"name":"タグ3"}
+      {"name":"タグ4"}
   ],
-  "title": "記事3",
+  "title": "記事_update",
   "thumbnail": null,
   "main_text": "## 見出し1\r\n## 見出し2"
 }
@@ -131,7 +143,7 @@ content-type: application/json
 ###
 
 # @name favorite
-POST   http://127.0.0.1:8000/api/v1/articles/favorite/
+POST   http://127.0.0.1:8000/api/v1/articles/favorites/
 Authorization: token {{token}}
 content-type: application/json
 
@@ -139,7 +151,7 @@ content-type: application/json
     "target_article":"c1559c4d-5408-45e1-bf42-a41a138a79de"
 }
 ###
-DELETE http://127.0.0.1:8000/api/v1/articles/favorite/
+DELETE http://127.0.0.1:8000/api/v1/articles/favorites/
 Authorization: token {{token}}
 content-type: application/json
 
