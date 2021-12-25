@@ -16,6 +16,22 @@
 @login_info_current = {"user_id": "admin","password": "password"}
 @current_password = {"current_password":"passw0rd01"}
 
+GET    http://127.0.0.1:8000/api/v1/aws/presignedURL?content_type=image/jpeg&file_hash=test.jpg
+Authorization: token {{token}}
+content-type: application/json
+
+###
+
+POST   http://127.0.0.1:8000/api/v1/aws/presignedURL/
+Authorization: token {{token}}
+content-type: application/json
+
+{
+    "key":"key",
+    "content_type":"content_type"
+}
+###
+
 # @name register
 POST   http://127.0.0.1:8000/api/v1/users/
 content-type: application/json

@@ -92,6 +92,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = ['email', 'username']
     USERNAME_FIELD = 'user_id'
     UPDATEONLY_FIELD = ['description', 'is_organizer']
+    READONLY_FIELD = ['id', ]
 
     class Meta:
         verbose_name = _('user')

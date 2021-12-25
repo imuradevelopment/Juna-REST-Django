@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'article.apps.ArticleConfig',
     'account.apps.AccountConfig',
+    'presignedURL.apps.PresignedurlConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -144,13 +145,14 @@ SIMPLE_JWT = {
     #トークンをJWTに設定
     'AUTH_HEADER_TYPES':('JWT'),
     #トークンの持続時間の設定
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=120)
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(minutes=5)
 }
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication', # 一時的に追加
-        #'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
 }
 

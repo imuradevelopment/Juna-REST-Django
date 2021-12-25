@@ -21,6 +21,7 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/', include('article.urls')),
+    path('api/v1/', include('presignedURL.urls')),
     path('api/v1/', include('djoser.urls')),
     path('api/v1/auth/', include('djoser.urls.jwt')),
     path('api/v1/auth/', include('djoser.urls.authtoken')), # 一時的に追加
